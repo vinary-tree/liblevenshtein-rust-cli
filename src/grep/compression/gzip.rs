@@ -15,7 +15,7 @@ use flate2::read::GzDecoder;
 /// ```ignore
 /// use std::fs::File;
 /// use std::io::Read;
-/// use liblevenshtein::grep::compression::gzip::GzipDecompressor;
+/// use crate::grep::compression::gzip::GzipDecompressor;
 ///
 /// let file = File::open("data.gz")?;
 /// let mut decompressor = GzipDecompressor::new(file);

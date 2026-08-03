@@ -36,7 +36,7 @@ const RENDER_DPI: i32 = 200;
 /// # Example
 ///
 /// ```ignore
-/// use liblevenshtein::grep::document::pdf_ocr::extract_text_ocr;
+/// use crate::grep::document::pdf_ocr::extract_text_ocr;
 ///
 /// let pdf_bytes = std::fs::read("scanned_document.pdf")?;
 /// let text = extract_text_ocr(&pdf_bytes, "eng")?;

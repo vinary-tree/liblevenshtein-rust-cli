@@ -1,19 +1,25 @@
 # Maintainer: F1R3FLY.io <noreply@f1r3fly.io>
 # NOTE: This PKGBUILD is for tagged releases
 pkgname=liblevenshtein
-pkgver=0.3.0
+pkgver=0.10.0
 pkgrel=1
-pkgdesc="Fast approximate string matching using Levenshtein automata"
+pkgdesc="Fuzzy matching, dictionary, REPL, and document grep utility"
 arch=('x86_64' 'aarch64')
-url="https://github.com/universal-automata/liblevenshtein-rust"
+url="https://github.com/universal-automata/liblevenshtein-rust-cli"
 license=('Apache')
 depends=('gcc-libs')
 makedepends=('rust' 'cargo' 'protobuf')
-source=("liblevenshtein::git+https://github.com/universal-automata/liblevenshtein-rust.git#tag=v${pkgver}")
+source=("liblevenshtein-cli::git+https://github.com/universal-automata/liblevenshtein-rust-cli.git#tag=v${pkgver}")
 sha256sums=('SKIP')
 
+prepare() {
+    cd "$srcdir/liblevenshtein-cli"
+    sed -i -E 's/path = "\.\.\/(liblevenshtein-rust|libdictenstein)", //g' Cargo.toml
+    cargo generate-lockfile
+}
+
 build() {
-    cd "$srcdir/liblevenshtein"
+    cd "$srcdir/liblevenshtein-cli"
     export CARGO_TARGET_DIR=target
 
     # Determine RUSTFLAGS based on architecture
@@ -23,12 +29,11 @@ build() {
         export RUSTFLAGS="-C target-feature=+aes,+neon"
     fi
 
-    cargo build --release --lib --all-features --locked
-    cargo build --release --bin liblevenshtein --features cli,compression,protobuf --locked
+    cargo build --release --locked
 }
 
 check() {
-    cd "$srcdir/liblevenshtein"
+    cd "$srcdir/liblevenshtein-cli"
 
     # Determine RUSTFLAGS based on architecture
     if [ "$CARCH" = "x86_64" ]; then
@@ -37,29 +42,18 @@ check() {
         export RUSTFLAGS="-C target-feature=+aes,+neon"
     fi
 
-    cargo test --release --all-features --locked
+    cargo test --release --locked
 }
 
 package() {
-    cd "$srcdir/liblevenshtein"
+    cd "$srcdir/liblevenshtein-cli"
 
     # Install binary
     install -Dm755 "target/release/liblevenshtein" "$pkgdir/usr/bin/liblevenshtein"
-
-    # Install libraries
-    install -Dm644 "target/release/libliblevenshtein.rlib" "$pkgdir/usr/lib/libliblevenshtein.rlib"
-
-    # Install shared library (Linux)
-    if [ -f "target/release/libliblevenshtein.so" ]; then
-        install -Dm644 "target/release/libliblevenshtein.so" "$pkgdir/usr/lib/libliblevenshtein.so"
-    fi
 
     # Install license and documentation
     install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
     install -Dm644 README.md "$pkgdir/usr/share/doc/$pkgname/README.md"
     install -Dm644 CHANGELOG.md "$pkgdir/usr/share/doc/$pkgname/CHANGELOG.md"
 
-    # Install examples
-    mkdir -p "$pkgdir/usr/share/doc/$pkgname/examples"
-    cp -r examples/*.rs "$pkgdir/usr/share/doc/$pkgname/examples/" 2>/dev/null || true
 }

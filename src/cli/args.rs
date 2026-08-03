@@ -7,8 +7,8 @@
 //! primitives in [`crate::cli::commands`], which the REPL reuses.
 
 use crate::repl::state::DictionaryBackend;
-use crate::transducer::Algorithm;
 use clap::{ArgGroup, Parser, ValueEnum};
+use liblevenshtein::transducer::Algorithm;
 use std::path::PathBuf;
 
 /// Command-line interface for liblevenshtein

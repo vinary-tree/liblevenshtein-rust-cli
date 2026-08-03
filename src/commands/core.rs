@@ -1,6 +1,6 @@
 //! Core command definitions and types shared between CLI and REPL
 
-use crate::transducer::Algorithm;
+use liblevenshtein::transducer::Algorithm;
 use std::path::PathBuf;
 
 #[cfg(feature = "cli")]

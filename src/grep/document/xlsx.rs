@@ -50,7 +50,7 @@ fn row_to_text<T: Display>(row: &[T]) -> Option<String> {
 /// # Example
 ///
 /// ```ignore
-/// use liblevenshtein::grep::document::xlsx::extract_text;
+/// use crate::grep::document::xlsx::extract_text;
 ///
 /// let xlsx_bytes = std::fs::read("spreadsheet.xlsx")?;
 /// let text = extract_text(&xlsx_bytes)?;

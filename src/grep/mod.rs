@@ -18,7 +18,7 @@
 //! ## Searching a compressed file
 //!
 //! ```ignore
-//! use liblevenshtein::grep::{GrepSource, GrepPath, GrepConfig};
+//! use crate::grep::{GrepSource, GrepPath, GrepConfig};
 //!
 //! let path = GrepPath::parse("logs.gz")?;
 //! let source = GrepSource::new(GrepConfig::default());
@@ -32,7 +32,7 @@
 //! ## Searching within archives
 //!
 //! ```ignore
-//! use liblevenshtein::grep::{GrepSource, GrepPath, GrepConfig};
+//! use crate::grep::{GrepSource, GrepPath, GrepConfig};
 //!
 //! // Search all files in archive
 //! let path = GrepPath::parse("source.tar.gz")?;
@@ -55,7 +55,7 @@ pub mod position_tracker;
 pub mod result;
 pub mod source;
 
-#[cfg(any(feature = "tar", feature = "zip"))]
+#[cfg(feature = "grep-archives")]
 pub mod archive;
 
 #[cfg(any(
@@ -74,7 +74,7 @@ pub use position_tracker::PositionTracker;
 pub use result::{GrepMatchResult, MatchLocation, SourceId};
 pub use source::GrepPath;
 
-#[cfg(any(feature = "tar", feature = "zip"))]
+#[cfg(feature = "grep-archives")]
 pub use archive::ArchiveFormat;
 
 #[cfg(any(
@@ -92,10 +92,10 @@ use std::path::Path;
 
 use compression::create_decompressor;
 
-#[cfg(feature = "tar")]
+#[cfg(feature = "grep-archives")]
 use archive::tar::TarArchiveReader;
 
-#[cfg(feature = "zip")]
+#[cfg(feature = "grep-archives")]
 use archive::zip::ZipArchiveReader;
 
 fn initial_plain_read_capacity(
@@ -246,7 +246,7 @@ impl GrepConfig {
 /// # Example
 ///
 /// ```ignore
-/// use liblevenshtein::grep::{GrepSource, GrepPath, GrepConfig};
+/// use crate::grep::{GrepSource, GrepPath, GrepConfig};
 ///
 /// let source = GrepSource::new(GrepConfig::default());
 /// let path = GrepPath::parse("data.tar.gz:*.log")?;
@@ -313,14 +313,14 @@ impl GrepSource {
             CompressionFormat::None
         };
 
-        #[cfg(any(feature = "tar", feature = "zip"))]
+        #[cfg(feature = "grep-archives")]
         let archive = if self.config.auto_decompress {
             path.archive
         } else {
             ArchiveFormat::None
         };
 
-        #[cfg(not(any(feature = "tar", feature = "zip")))]
+        #[cfg(not(feature = "grep-archives"))]
         let archive = ();
 
         // Get filter pattern
@@ -330,29 +330,29 @@ impl GrepSource {
             .or_else(|| self.config.default_archive_filter.clone());
 
         // Create appropriate iterator
-        #[cfg(any(feature = "tar", feature = "zip"))]
+        #[cfg(feature = "grep-archives")]
         match archive {
             ArchiveFormat::None => {
                 // Plain file (possibly compressed)
                 self.open_plain_file(fs_path, metadata.len(), compression)
             }
-            #[cfg(feature = "tar")]
+            #[cfg(feature = "grep-archives")]
             ArchiveFormat::Tar {
                 compression: tar_compression,
             } => self.open_tar_archive(fs_path, tar_compression, filter),
-            #[cfg(not(feature = "tar"))]
+            #[cfg(not(feature = "grep-archives"))]
             ArchiveFormat::Tar { .. } => Err(GrepError::FeatureNotEnabled {
                 feature: "tar".to_string(),
             }),
-            #[cfg(feature = "zip")]
+            #[cfg(feature = "grep-archives")]
             ArchiveFormat::Zip => self.open_zip_archive(fs_path, filter),
-            #[cfg(not(feature = "zip"))]
+            #[cfg(not(feature = "grep-archives"))]
             ArchiveFormat::Zip => Err(GrepError::FeatureNotEnabled {
                 feature: "zip".to_string(),
             }),
         }
 
-        #[cfg(not(any(feature = "tar", feature = "zip")))]
+        #[cfg(not(feature = "grep-archives"))]
         {
             let _ = (archive, filter);
             self.open_plain_file(fs_path, metadata.len(), compression)
@@ -421,7 +421,7 @@ impl GrepSource {
     }
 
     /// Open a tar archive.
-    #[cfg(feature = "tar")]
+    #[cfg(feature = "grep-archives")]
     fn open_tar_archive(
         &self,
         path: &Path,
@@ -445,7 +445,7 @@ impl GrepSource {
     }
 
     /// Open a zip archive.
-    #[cfg(feature = "zip")]
+    #[cfg(feature = "grep-archives")]
     fn open_zip_archive(
         &self,
         path: &Path,
@@ -531,7 +531,7 @@ enum GrepEntryIteratorInner {
     /// Single plain file entry.
     Single(std::option::IntoIter<GrepEntry>),
     /// Archive entries.
-    #[cfg(any(feature = "tar", feature = "zip"))]
+    #[cfg(feature = "grep-archives")]
     Archive(Box<dyn Iterator<Item = GrepResult<GrepEntry>>>),
 }
 
@@ -541,7 +541,7 @@ impl Iterator for GrepEntryIterator {
     fn next(&mut self) -> Option<Self::Item> {
         match &mut self.inner {
             GrepEntryIteratorInner::Single(iter) => iter.next().map(Ok),
-            #[cfg(any(feature = "tar", feature = "zip"))]
+            #[cfg(feature = "grep-archives")]
             GrepEntryIteratorInner::Archive(iter) => iter.next(),
         }
     }
@@ -550,10 +550,10 @@ impl Iterator for GrepEntryIterator {
 #[cfg(test)]
 mod tests {
     use super::*;
-    #[cfg(feature = "zip")]
+    #[cfg(feature = "grep-archives")]
     use std::fs::File;
     use std::io::Cursor;
-    #[cfg(feature = "zip")]
+    #[cfg(feature = "grep-archives")]
     use std::io::Write;
 
     #[test]
@@ -656,7 +656,7 @@ mod tests {
         assert_eq!(entry.source_id().display(), "archive.tar.gz:dir/file.txt");
     }
 
-    #[cfg(feature = "zip")]
+    #[cfg(feature = "grep-archives")]
     #[test]
     fn test_grep_source_applies_max_size_to_zip_entries() {
         let dir = tempfile::tempdir().expect("create temp dir");

@@ -9,16 +9,16 @@
 //! All decompressors implement streaming via the standard `Read` trait,
 //! allowing chunk-by-chunk processing without loading entire files into memory.
 
-#[cfg(feature = "flate2")]
+#[cfg(feature = "grep-compression")]
 pub mod gzip;
 
-#[cfg(feature = "zstd")]
+#[cfg(feature = "grep-compression")]
 pub mod zstd;
 
-#[cfg(feature = "xz2")]
+#[cfg(feature = "grep-compression")]
 pub mod lzma;
 
-#[cfg(feature = "bzip2")]
+#[cfg(feature = "grep-compression")]
 pub mod bzip2;
 
 pub mod detection;
@@ -50,7 +50,7 @@ impl CompressionFormat {
     ///
     /// ```
     /// use std::path::Path;
-    /// use liblevenshtein::grep::CompressionFormat;
+    /// use crate::grep::CompressionFormat;
     ///
     /// assert_eq!(
     ///     CompressionFormat::from_extension(Path::new("file.txt.gz")),
@@ -97,10 +97,10 @@ impl CompressionFormat {
     pub fn is_available(&self) -> bool {
         match self {
             Self::None => true,
-            Self::Gzip => cfg!(feature = "flate2"),
-            Self::Zstd => cfg!(feature = "zstd"),
-            Self::Xz => cfg!(feature = "xz2"),
-            Self::Bzip2 => cfg!(feature = "bzip2"),
+            Self::Gzip => cfg!(feature = "grep-compression"),
+            Self::Zstd => cfg!(feature = "grep-compression"),
+            Self::Xz => cfg!(feature = "grep-compression"),
+            Self::Bzip2 => cfg!(feature = "grep-compression"),
         }
     }
 
@@ -157,7 +157,7 @@ impl<R: Read> Read for PassthroughReader<R> {
 /// ```ignore
 /// use std::fs::File;
 /// use std::io::Read;
-/// use liblevenshtein::grep::compression::{CompressionFormat, create_decompressor};
+/// use crate::grep::compression::{CompressionFormat, create_decompressor};
 ///
 /// let file = File::open("data.gz")?;
 /// let mut reader = create_decompressor(file, CompressionFormat::Gzip)?;
@@ -172,38 +172,38 @@ pub fn create_decompressor<R: Read + Send + 'static>(
     match format {
         CompressionFormat::None => Ok(Box::new(PassthroughReader::new(reader))),
 
-        #[cfg(feature = "flate2")]
+        #[cfg(feature = "grep-compression")]
         CompressionFormat::Gzip => Ok(Box::new(gzip::GzipDecompressor::new(reader))),
 
-        #[cfg(not(feature = "flate2"))]
+        #[cfg(not(feature = "grep-compression"))]
         CompressionFormat::Gzip => Err(GrepError::FeatureNotEnabled {
             feature: "flate2".to_string(),
         }),
 
-        #[cfg(feature = "zstd")]
+        #[cfg(feature = "grep-compression")]
         CompressionFormat::Zstd => {
             let decoder = zstd::ZstdDecompressor::new(reader)
                 .map_err(|e| GrepError::decompression("", e.to_string()))?;
             Ok(Box::new(decoder))
         }
 
-        #[cfg(not(feature = "zstd"))]
+        #[cfg(not(feature = "grep-compression"))]
         CompressionFormat::Zstd => Err(GrepError::FeatureNotEnabled {
             feature: "zstd".to_string(),
         }),
 
-        #[cfg(feature = "xz2")]
+        #[cfg(feature = "grep-compression")]
         CompressionFormat::Xz => Ok(Box::new(lzma::XzDecompressor::new(reader))),
 
-        #[cfg(not(feature = "xz2"))]
+        #[cfg(not(feature = "grep-compression"))]
         CompressionFormat::Xz => Err(GrepError::FeatureNotEnabled {
             feature: "xz2".to_string(),
         }),
 
-        #[cfg(feature = "bzip2")]
+        #[cfg(feature = "grep-compression")]
         CompressionFormat::Bzip2 => Ok(Box::new(bzip2::Bzip2Decompressor::new(reader))),
 
-        #[cfg(not(feature = "bzip2"))]
+        #[cfg(not(feature = "grep-compression"))]
         CompressionFormat::Bzip2 => Err(GrepError::FeatureNotEnabled {
             feature: "bzip2".to_string(),
         }),

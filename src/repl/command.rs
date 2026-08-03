@@ -4,9 +4,9 @@
 
 use super::state::{DictionaryBackend, ReplState};
 use crate::cli::args::SerializationFormat;
-use crate::transducer::Algorithm;
 use anyhow::{Context, Result};
 use colored::Colorize;
+use liblevenshtein::transducer::Algorithm;
 use std::io::{self, Write};
 use std::path::{Path, PathBuf};
 

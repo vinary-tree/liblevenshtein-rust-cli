@@ -27,12 +27,6 @@ updates:
       security:
         applies-to: security-updates
         patterns: ["*"]
-    ignore:
-      # bincode 3.0.0 is a tombstone release containing only a compiler error.
-      # Cargo.toml pins `<3` and deny.toml bans `>=3.0.0`.
-      - dependency-name: "bincode"
-        versions: [">=3.0.0"]
-
   - package-ecosystem: github-actions
     directory: "/"
     schedule:

@@ -206,7 +206,7 @@ fn parse_package(package_path: &str, xml: &str) -> GrepResult<Package> {
 /// # Example
 ///
 /// ```ignore
-/// use liblevenshtein::grep::document::epub::extract_text;
+/// use crate::grep::document::epub::extract_text;
 ///
 /// let epub_bytes = std::fs::read("book.epub")?;
 /// let text = extract_text(&epub_bytes)?;

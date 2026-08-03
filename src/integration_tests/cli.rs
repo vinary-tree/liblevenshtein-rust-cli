@@ -6,10 +6,10 @@ mod cli_integration_tests {
     use std::path::{Path, PathBuf};
     use std::sync::atomic::{AtomicUsize, Ordering};
 
-    use liblevenshtein::cli::args::SerializationFormat;
-    use liblevenshtein::cli::detect::{detect_format, DetectionMethod};
-    use liblevenshtein::cli::paths::{file_extension, PersistentConfig};
-    use liblevenshtein::repl::state::DictionaryBackend;
+    use crate::cli::args::SerializationFormat;
+    use crate::cli::detect::{detect_format, DetectionMethod};
+    use crate::cli::paths::{file_extension, PersistentConfig};
+    use crate::repl::state::DictionaryBackend;
 
     static SCRATCH_COUNTER: AtomicUsize = AtomicUsize::new(0);
 

@@ -1,4 +1,4 @@
-# cargo-deny configuration for liblevenshtein.
+# cargo-deny configuration for liblevenshtein-cli.
 #
 # Added 2026-07 after a fleet-wide OSV sweep found five advisories in this locked
 # tree, including two denial-of-service issues in quick-xml that arrived through a
@@ -21,7 +21,7 @@ yanked = "deny"
 # Every entry MUST carry a reason and a REVIEW-BY date. An advisory with no fixed
 # version is a standing risk to re-evaluate, not something to mute permanently.
 ignore = [
-  { id = "RUSTSEC-2026-0192", reason = "REVIEW-BY 2026-10-31. ttf-parser is unmaintained with no fixed version. Reached only transitively via pdf-extract, under the optional `pdf` document-format feature, and only when parsing local files the caller already chose to open. Re-evaluate if pdf-extract gains a replacement font parser." },
+  { id = "RUSTSEC-2026-0192", reason = "REVIEW-BY 2026-10-31. ttf-parser is unmaintained with no fixed version. Reached only transitively via pdf-extract, under the optional `grep-pdf` document feature, and only when parsing local files the caller chose to open. Re-evaluate if pdf-extract gains a replacement font parser." },
 ]
 
 [licenses]

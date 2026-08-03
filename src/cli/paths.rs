@@ -145,14 +145,14 @@ impl AppConfig {
         let contents = std::fs::read(&path)
             .with_context(|| format!("Failed to read app config: {}", path.display()))?;
 
-        crate::serialization::bincode_compat::deserialize(&contents)
+        libdictenstein::serialization::bincode_compat::deserialize(&contents)
             .with_context(|| format!("Failed to decode app config: {}", path.display()))
     }
 
     /// Save application config
     pub fn save(&self) -> Result<()> {
         let path = app_config_path()?;
-        let contents = crate::serialization::bincode_compat::serialize(self)?;
+        let contents = libdictenstein::serialization::bincode_compat::serialize(self)?;
         std::fs::write(&path, contents)
             .with_context(|| format!("Failed to write app config: {}", path.display()))
     }
@@ -191,7 +191,7 @@ pub struct PersistentConfig {
     /// Default format
     pub format: Option<SerializationFormat>,
     /// Default algorithm
-    pub algorithm: Option<crate::transducer::Algorithm>,
+    pub algorithm: Option<liblevenshtein::transducer::Algorithm>,
     /// Default max distance
     pub max_distance: Option<usize>,
     /// Default prefix mode
@@ -220,7 +220,7 @@ impl PersistentConfig {
         let contents = std::fs::read(&path)
             .with_context(|| format!("Failed to read config file: {}", path.display()))?;
 
-        crate::serialization::bincode_compat::deserialize(&contents)
+        libdictenstein::serialization::bincode_compat::deserialize(&contents)
             .with_context(|| format!("Failed to decode config file: {}", path.display()))
     }
 
@@ -232,7 +232,7 @@ impl PersistentConfig {
     /// Save configuration to custom path
     pub fn save_to(&self, custom_path: Option<PathBuf>) -> Result<()> {
         let path = config_file_path_with_override(custom_path)?;
-        let contents = crate::serialization::bincode_compat::serialize(self)?;
+        let contents = libdictenstein::serialization::bincode_compat::serialize(self)?;
         std::fs::write(&path, contents)
             .with_context(|| format!("Failed to write config file: {}", path.display()))
     }
@@ -246,7 +246,7 @@ impl PersistentConfig {
         }
 
         // Save to destination
-        let contents = crate::serialization::bincode_compat::serialize(self)?;
+        let contents = libdictenstein::serialization::bincode_compat::serialize(self)?;
         std::fs::write(dest, contents)
             .with_context(|| format!("Failed to write config file: {}", dest.display()))
     }
@@ -284,7 +284,7 @@ impl Default for PersistentConfig {
             dict_path: None,
             backend: None,
             format: default_format,
-            algorithm: Some(crate::transducer::Algorithm::Standard),
+            algorithm: Some(liblevenshtein::transducer::Algorithm::Standard),
             max_distance: Some(2),
             prefix_mode: Some(false),
             show_distances: Some(false),

@@ -12,7 +12,7 @@ use crate::grep::result::{MatchLocation, SourceId};
 /// # Example
 ///
 /// ```
-/// use liblevenshtein::grep::PositionTracker;
+/// use crate::grep::PositionTracker;
 ///
 /// let mut tracker = PositionTracker::new();
 /// tracker.advance("Hello\nWorld\n");
@@ -121,7 +121,7 @@ impl PositionTracker {
     /// # Example
     ///
     /// ```
-    /// use liblevenshtein::grep::PositionTracker;
+    /// use crate::grep::PositionTracker;
     ///
     /// let mut tracker = PositionTracker::new();
     /// tracker.advance("line1\nline2\n");

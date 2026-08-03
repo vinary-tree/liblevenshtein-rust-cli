@@ -17,21 +17,21 @@
 
 use std::path::{Path, PathBuf};
 
-#[cfg(any(feature = "tar", feature = "zip"))]
+#[cfg(feature = "grep-archives")]
 use crate::grep::archive::ArchiveFormat;
 use crate::grep::compression::CompressionFormat;
 use crate::grep::error::{GrepError, GrepResult};
 
 /// Stub archive format when archive features are not enabled.
 /// Used only for type compatibility.
-#[cfg(not(any(feature = "tar", feature = "zip")))]
+#[cfg(not(feature = "grep-archives"))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ArchiveFormat {
     /// Not an archive (this is the only variant when archives are disabled).
     None,
 }
 
-#[cfg(not(any(feature = "tar", feature = "zip")))]
+#[cfg(not(feature = "grep-archives"))]
 impl ArchiveFormat {
     /// Always returns `None` when archive features are disabled.
     pub fn from_path(_path: &Path) -> Self {
@@ -77,7 +77,7 @@ impl GrepPath {
     /// # Examples
     ///
     /// ```
-    /// use liblevenshtein::grep::GrepPath;
+    /// use crate::grep::GrepPath;
     ///
     /// // Plain file
     /// let path = GrepPath::parse("file.txt").unwrap();
@@ -108,13 +108,13 @@ impl GrepPath {
 
         let path = PathBuf::from(path_str);
         let archive = ArchiveFormat::from_path(&path);
-        #[cfg(any(feature = "tar", feature = "zip"))]
+        #[cfg(feature = "grep-archives")]
         let compression = match &archive {
             ArchiveFormat::Tar { compression } => *compression,
             ArchiveFormat::Zip => CompressionFormat::None, // Zip handles compression internally
             ArchiveFormat::None => CompressionFormat::from_extension(&path),
         };
-        #[cfg(not(any(feature = "tar", feature = "zip")))]
+        #[cfg(not(feature = "grep-archives"))]
         let compression = CompressionFormat::from_extension(&path);
 
         // Validate: filters only make sense for archives
@@ -139,13 +139,13 @@ impl GrepPath {
     pub fn from_path(path: impl Into<PathBuf>) -> Self {
         let path = path.into();
         let archive = ArchiveFormat::from_path(&path);
-        #[cfg(any(feature = "tar", feature = "zip"))]
+        #[cfg(feature = "grep-archives")]
         let compression = match &archive {
             ArchiveFormat::Tar { compression } => *compression,
             ArchiveFormat::Zip => CompressionFormat::None,
             ArchiveFormat::None => CompressionFormat::from_extension(&path),
         };
-        #[cfg(not(any(feature = "tar", feature = "zip")))]
+        #[cfg(not(feature = "grep-archives"))]
         let compression = CompressionFormat::from_extension(&path);
 
         Self {
@@ -273,7 +273,7 @@ mod tests {
         assert!(!path.is_archive());
     }
 
-    #[cfg(any(feature = "tar", feature = "zip"))]
+    #[cfg(feature = "grep-archives")]
     #[test]
     fn test_parse_tar_archive() {
         let path = GrepPath::parse("archive.tar").expect("should parse");
@@ -289,7 +289,7 @@ mod tests {
         assert!(path.is_archive());
     }
 
-    #[cfg(any(feature = "tar", feature = "zip"))]
+    #[cfg(feature = "grep-archives")]
     #[test]
     fn test_parse_tar_gz_archive() {
         let path = GrepPath::parse("archive.tar.gz").expect("should parse");
@@ -304,7 +304,7 @@ mod tests {
         ));
     }
 
-    #[cfg(any(feature = "tar", feature = "zip"))]
+    #[cfg(feature = "grep-archives")]
     #[test]
     fn test_parse_archive_with_filter() {
         let path = GrepPath::parse("logs.tar.gz:*.log").expect("should parse");
@@ -312,7 +312,7 @@ mod tests {
         assert_eq!(path.archive_filter, Some("*.log".to_string()));
     }
 
-    #[cfg(any(feature = "tar", feature = "zip"))]
+    #[cfg(feature = "grep-archives")]
     #[test]
     fn test_parse_archive_with_path_filter() {
         let path = GrepPath::parse("src.zip:src/**/*.rs").expect("should parse");
@@ -333,7 +333,7 @@ mod tests {
         assert!(result.is_err());
     }
 
-    #[cfg(any(feature = "tar", feature = "zip"))]
+    #[cfg(feature = "grep-archives")]
     #[test]
     fn test_parse_empty_filter_fails() {
         let result = GrepPath::parse("archive.tar:");
@@ -346,7 +346,7 @@ mod tests {
         assert!(result.is_err());
     }
 
-    #[cfg(any(feature = "tar", feature = "zip"))]
+    #[cfg(feature = "grep-archives")]
     #[test]
     fn test_display_with_archive() {
         let path = GrepPath::parse("logs.tar.gz:*.log").expect("should parse");

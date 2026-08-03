@@ -15,7 +15,7 @@ use bzip2::read::BzDecoder;
 /// ```ignore
 /// use std::fs::File;
 /// use std::io::Read;
-/// use liblevenshtein::grep::compression::bzip2::Bzip2Decompressor;
+/// use crate::grep::compression::bzip2::Bzip2Decompressor;
 ///
 /// let file = File::open("data.bz2")?;
 /// let mut decompressor = Bzip2Decompressor::new(file);

@@ -14,9 +14,9 @@ use crate::commands::core::{
 use crate::repl::state::{DictContainer, DictionaryBackend};
 
 #[cfg(feature = "serialization")]
-use crate::serialization::{BincodeSerializer, DictionarySerializer};
+use libdictenstein::serialization::{BincodeSerializer, DictionarySerializer};
 #[cfg(feature = "protobuf")]
-use crate::serialization::{ProtobufSerializer, SuffixAutomatonProtobufSerializer};
+use libdictenstein::serialization::{ProtobufSerializer, SuffixAutomatonProtobufSerializer};
 
 // ============================================================================
 // Serialization (Save) Operations
@@ -114,7 +114,7 @@ fn save_protobuf_dict(container: &DictContainer, path: &Path) -> Result<()> {
 
 #[cfg(feature = "compression")]
 fn save_bincode_gzip_dict(container: &DictContainer, path: &Path) -> Result<()> {
-    use crate::serialization::GzipSerializer;
+    use libdictenstein::serialization::GzipSerializer;
 
     let file = std::fs::File::create(path)?;
     match container {
@@ -132,9 +132,9 @@ fn save_bincode_gzip_dict(container: &DictContainer, path: &Path) -> Result<()> 
 
 #[cfg(all(feature = "protobuf", feature = "compression"))]
 fn save_protobuf_gzip_dict(container: &DictContainer, path: &Path) -> Result<()> {
-    use crate::serialization::GzipSerializer;
     use flate2::write::GzEncoder;
     use flate2::Compression;
+    use libdictenstein::serialization::GzipSerializer;
 
     let file = std::fs::File::create(path)?;
     match container {
@@ -260,9 +260,9 @@ fn load_protobuf_dict(path: &Path, backend: DictionaryBackend) -> Result<DictCon
 
 #[cfg(feature = "compression")]
 fn load_bincode_gzip_dict(path: &Path, backend: DictionaryBackend) -> Result<DictContainer> {
-    use crate::serialization::GzipSerializer;
     use libdictenstein::double_array_trie::DoubleArrayTrie;
     use libdictenstein::pathmap::PathMapDictionary;
+    use libdictenstein::serialization::GzipSerializer;
     use libdictenstein::suffix_automaton::SuffixAutomaton;
 
     let file = std::fs::File::open(path)?;
@@ -290,11 +290,11 @@ fn load_bincode_gzip_dict(path: &Path, backend: DictionaryBackend) -> Result<Dic
 
 #[cfg(all(feature = "protobuf", feature = "compression"))]
 fn load_protobuf_gzip_dict(path: &Path, backend: DictionaryBackend) -> Result<DictContainer> {
-    use crate::serialization::GzipSerializer;
     use flate2::read::GzDecoder;
     use libdictenstein::double_array_trie::DoubleArrayTrie;
     use libdictenstein::dynamic_dawg::DynamicDawg;
     use libdictenstein::pathmap::PathMapDictionary;
+    use libdictenstein::serialization::GzipSerializer;
 
     let file = std::fs::File::open(path)?;
     let container = match backend {

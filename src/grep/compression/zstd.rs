@@ -13,7 +13,7 @@ use std::io::{self, BufReader, Read};
 /// ```ignore
 /// use std::fs::File;
 /// use std::io::Read;
-/// use liblevenshtein::grep::compression::zstd::ZstdDecompressor;
+/// use crate::grep::compression::zstd::ZstdDecompressor;
 ///
 /// let file = File::open("data.zst")?;
 /// let mut decompressor = ZstdDecompressor::new(file)?;

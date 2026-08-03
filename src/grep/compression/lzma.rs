@@ -16,7 +16,7 @@ use xz2::read::XzDecoder;
 /// ```ignore
 /// use std::fs::File;
 /// use std::io::Read;
-/// use liblevenshtein::grep::compression::lzma::XzDecompressor;
+/// use crate::grep::compression::lzma::XzDecompressor;
 ///
 /// let file = File::open("data.xz")?;
 /// let mut decompressor = XzDecompressor::new(file);

@@ -19,7 +19,7 @@ use crate::grep::error::{GrepError, GrepResult};
 /// # Example
 ///
 /// ```ignore
-/// use liblevenshtein::grep::document::docx::extract_text;
+/// use crate::grep::document::docx::extract_text;
 ///
 /// let docx_bytes = std::fs::read("document.docx")?;
 /// let text = extract_text(&docx_bytes)?;

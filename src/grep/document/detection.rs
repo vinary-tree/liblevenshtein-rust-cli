@@ -39,8 +39,8 @@ pub const MIN_HEADER_SIZE: usize = 8;
 /// # Example
 ///
 /// ```ignore
-/// use liblevenshtein::grep::document::detection::detect_document_format;
-/// use liblevenshtein::grep::document::DocumentFormat;
+/// use crate::grep::document::detection::detect_document_format;
+/// use crate::grep::document::DocumentFormat;
 /// use std::path::Path;
 ///
 /// // PDF detection by magic bytes

@@ -10,10 +10,10 @@
 pub mod entry;
 pub mod filter;
 
-#[cfg(feature = "tar")]
+#[cfg(feature = "grep-archives")]
 pub mod tar;
 
-#[cfg(feature = "zip")]
+#[cfg(feature = "grep-archives")]
 pub mod zip;
 
 use std::path::Path;
@@ -45,8 +45,8 @@ impl ArchiveFormat {
     ///
     /// ```
     /// use std::path::Path;
-    /// use liblevenshtein::grep::ArchiveFormat;
-    /// use liblevenshtein::grep::CompressionFormat;
+    /// use crate::grep::ArchiveFormat;
+    /// use crate::grep::CompressionFormat;
     ///
     /// assert!(matches!(
     ///     ArchiveFormat::from_path(Path::new("archive.tar.gz")),
@@ -126,8 +126,10 @@ impl ArchiveFormat {
     pub fn is_available(&self) -> bool {
         match self {
             Self::None => true,
-            Self::Tar { compression } => cfg!(feature = "tar") && compression.is_available(),
-            Self::Zip => cfg!(feature = "zip"),
+            Self::Tar { compression } => {
+                cfg!(feature = "grep-archives") && compression.is_available()
+            }
+            Self::Zip => cfg!(feature = "grep-archives"),
         }
     }
 

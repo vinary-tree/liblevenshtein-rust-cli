@@ -2,13 +2,13 @@
 //!
 //! This module provides utilities to filter archive entries by glob patterns.
 
-#[cfg(feature = "globset")]
+#[cfg(feature = "grep-archives")]
 use crate::grep::error::GrepError;
 use crate::grep::error::GrepResult;
 
 use super::entry::normalize_archive_path;
 
-#[cfg(feature = "globset")]
+#[cfg(feature = "grep-archives")]
 use globset::{GlobBuilder, GlobMatcher};
 
 /// A compiled filter for archive entry paths.
@@ -18,7 +18,7 @@ pub struct EntryFilter {
     pattern: String,
 
     /// Compiled glob matcher.
-    #[cfg(feature = "globset")]
+    #[cfg(feature = "grep-archives")]
     matcher: GlobMatcher,
 }
 
@@ -36,7 +36,7 @@ impl EntryFilter {
     /// # Examples
     ///
     /// ```ignore
-    /// use liblevenshtein::grep::archive::filter::EntryFilter;
+    /// use crate::grep::archive::filter::EntryFilter;
     ///
     /// // Match all .rs files
     /// let filter = EntryFilter::new("*.rs")?;
@@ -49,7 +49,7 @@ impl EntryFilter {
     /// assert!(filter.matches("src/main.rs"));
     /// assert!(filter.matches("src/foo/bar/baz.rs"));
     /// ```
-    #[cfg(feature = "globset")]
+    #[cfg(feature = "grep-archives")]
     pub fn new(pattern: &str) -> GrepResult<Self> {
         // Use literal_separator(true) so that '*' doesn't match '/'
         // This makes '*.rs' match 'main.rs' but not 'src/main.rs'
@@ -66,7 +66,7 @@ impl EntryFilter {
     }
 
     /// Create a new entry filter (no-op when globset feature is disabled).
-    #[cfg(not(feature = "globset"))]
+    #[cfg(not(feature = "grep-archives"))]
     pub fn new(pattern: &str) -> GrepResult<Self> {
         Ok(Self {
             pattern: pattern.to_string(),
@@ -74,7 +74,7 @@ impl EntryFilter {
     }
 
     /// Check if a path matches this filter.
-    #[cfg(feature = "globset")]
+    #[cfg(feature = "grep-archives")]
     pub fn matches(&self, path: &str) -> bool {
         // Normalize path for matching
         let normalized = normalize_archive_path(path);
@@ -82,7 +82,7 @@ impl EntryFilter {
     }
 
     /// Check if a path matches this filter (simple substring when globset disabled).
-    #[cfg(not(feature = "globset"))]
+    #[cfg(not(feature = "grep-archives"))]
     pub fn matches(&self, path: &str) -> bool {
         // Fallback: simple substring matching
         let normalized = normalize_archive_path(path);
@@ -117,11 +117,11 @@ impl EntryFilter {
 
     /// Create a filter that matches all entries.
     pub fn match_all() -> Self {
-        #[cfg(feature = "globset")]
+        #[cfg(feature = "grep-archives")]
         {
             Self::new("**/*").expect("** pattern should always compile")
         }
-        #[cfg(not(feature = "globset"))]
+        #[cfg(not(feature = "grep-archives"))]
         {
             Self {
                 pattern: "*".to_string(),
@@ -181,7 +181,7 @@ mod tests {
         assert!(filter.matches("path/to/file.txt"));
     }
 
-    #[cfg(feature = "globset")]
+    #[cfg(feature = "grep-archives")]
     #[test]
     fn test_glob_star() {
         let filter = EntryFilter::new("*.rs").expect("should compile");
@@ -191,7 +191,7 @@ mod tests {
         assert!(!filter.matches("main.txt"));
     }
 
-    #[cfg(feature = "globset")]
+    #[cfg(feature = "grep-archives")]
     #[test]
     fn test_glob_double_star() {
         let filter = EntryFilter::new("**/*.rs").expect("should compile");
@@ -201,7 +201,7 @@ mod tests {
         assert!(!filter.matches("main.txt"));
     }
 
-    #[cfg(feature = "globset")]
+    #[cfg(feature = "grep-archives")]
     #[test]
     fn test_glob_directory() {
         let filter = EntryFilter::new("src/**").expect("should compile");
@@ -210,7 +210,7 @@ mod tests {
         assert!(!filter.matches("tests/test.rs"));
     }
 
-    #[cfg(feature = "globset")]
+    #[cfg(feature = "grep-archives")]
     #[test]
     fn test_glob_alternatives() {
         let filter = EntryFilter::new("*.{rs,toml}").expect("should compile");

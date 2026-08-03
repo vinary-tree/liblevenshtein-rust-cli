@@ -36,8 +36,8 @@ pub const MIN_HEADER_SIZE: usize = 6;
 /// # Example
 ///
 /// ```
-/// use liblevenshtein::grep::compression::detection::detect_from_magic;
-/// use liblevenshtein::grep::CompressionFormat;
+/// use crate::grep::compression::detection::detect_from_magic;
+/// use crate::grep::CompressionFormat;
 ///
 /// // Gzip magic bytes
 /// let gzip_header = [0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00];

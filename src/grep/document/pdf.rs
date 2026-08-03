@@ -25,7 +25,7 @@ use gag::Gag;
 /// # Example
 ///
 /// ```ignore
-/// use liblevenshtein::grep::document::pdf::extract_text;
+/// use crate::grep::document::pdf::extract_text;
 ///
 /// let pdf_bytes = std::fs::read("document.pdf")?;
 /// let text = extract_text(&pdf_bytes)?;

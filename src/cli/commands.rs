@@ -14,25 +14,25 @@ use std::path::{Path, PathBuf};
 use crate::commands::core::QueryParams;
 use crate::commands::handlers::query::execute_query;
 use crate::repl::state::{DictContainer, DictionaryBackend};
-use crate::transducer::Algorithm;
 use libdictenstein::double_array_trie::DoubleArrayTrie;
 use libdictenstein::dynamic_dawg::DynamicDawg;
 use libdictenstein::pathmap::PathMapDictionary;
 use libdictenstein::suffix_automaton::SuffixAutomaton;
 use libdictenstein::{Dictionary, DictionaryNode};
+use liblevenshtein::transducer::Algorithm;
 
 #[cfg(feature = "serialization")]
-use crate::serialization::{BincodeSerializer, DictionarySerializer};
+use libdictenstein::serialization::{BincodeSerializer, DictionarySerializer};
 #[cfg(feature = "protobuf")]
-use crate::serialization::{ProtobufSerializer, SuffixAutomatonProtobufSerializer};
+use libdictenstein::serialization::{ProtobufSerializer, SuffixAutomatonProtobufSerializer};
 
 // Phonetic rule imports
 #[cfg(feature = "phonetic-rules")]
-use crate::phonetic::apply_rules_seq_char;
+use liblevenshtein::phonetic::apply_rules_seq_char;
 
 // Phonetic grep imports
 #[cfg(feature = "phonetic-rules")]
-use crate::phonetic::grep::PhoneticGrep;
+use liblevenshtein::phonetic::grep::PhoneticGrep;
 
 use super::args::{Cli, SerializationFormat};
 use super::detect::{detect_format, DictFormat};
@@ -604,7 +604,7 @@ fn load_protobuf_dict(path: &Path, backend: DictionaryBackend) -> Result<DictCon
 
 #[cfg(feature = "compression")]
 fn load_bincode_gzip_dict(path: &Path, backend: DictionaryBackend) -> Result<DictContainer> {
-    use crate::serialization::GzipSerializer;
+    use libdictenstein::serialization::GzipSerializer;
 
     let file = std::fs::File::open(path)?;
     let container = match backend {
@@ -632,8 +632,8 @@ fn load_bincode_gzip_dict(path: &Path, backend: DictionaryBackend) -> Result<Dic
 
 #[cfg(all(feature = "protobuf", feature = "compression"))]
 fn load_protobuf_gzip_dict(path: &Path, backend: DictionaryBackend) -> Result<DictContainer> {
-    use crate::serialization::GzipSerializer;
     use flate2::read::GzDecoder;
+    use libdictenstein::serialization::GzipSerializer;
 
     let file = std::fs::File::open(path)?;
     let container = match backend {
@@ -777,7 +777,7 @@ fn save_protobuf_dict(container: &DictContainer, path: &Path) -> Result<()> {
 
 #[cfg(feature = "compression")]
 fn save_bincode_gzip_dict(container: &DictContainer, path: &Path) -> Result<()> {
-    use crate::serialization::GzipSerializer;
+    use libdictenstein::serialization::GzipSerializer;
 
     let file = std::fs::File::create(path)?;
     match container {
@@ -795,9 +795,9 @@ fn save_bincode_gzip_dict(container: &DictContainer, path: &Path) -> Result<()> 
 
 #[cfg(all(feature = "protobuf", feature = "compression"))]
 fn save_protobuf_gzip_dict(container: &DictContainer, path: &Path) -> Result<()> {
-    use crate::serialization::GzipSerializer;
     use flate2::write::GzEncoder;
     use flate2::Compression;
+    use libdictenstein::serialization::GzipSerializer;
 
     let file = std::fs::File::create(path)?;
     match container {
@@ -1073,8 +1073,8 @@ fn print_config(config: &PersistentConfig) {
 /// Compile phonetic rules from .llev to binary format
 #[cfg(all(feature = "phonetic-rules", feature = "serialization"))]
 fn cmd_compile(input: &Path, output: Option<PathBuf>, unicode: bool, verify: bool) -> Result<()> {
-    use crate::phonetic::llev::{load_file_with_includes, RuleSet, RuleSetChar};
-    use crate::phonetic::{save, save_char};
+    use liblevenshtein::phonetic::llev::{load_file_with_includes, RuleSet, RuleSetChar};
+    use liblevenshtein::phonetic::{save, save_char};
 
     println!("{}", "Compiling Phonetic Rules".bold().underline());
     println!();
@@ -1128,7 +1128,7 @@ fn cmd_compile(input: &Path, output: Option<PathBuf>, unicode: bool, verify: boo
         if verify {
             println!();
             println!("  {} Verifying...", "→".cyan());
-            let loaded = crate::phonetic::load_char(&output_path)
+            let loaded = liblevenshtein::phonetic::load_char(&output_path)
                 .map_err(|e| anyhow::anyhow!("Verification failed: {}", e))?;
 
             if loaded.rules.len() == ruleset.rules.len() {
@@ -1155,7 +1155,7 @@ fn cmd_compile(input: &Path, output: Option<PathBuf>, unicode: bool, verify: boo
         if verify {
             println!();
             println!("  {} Verifying...", "→".cyan());
-            let loaded = crate::phonetic::load(&output_path)
+            let loaded = liblevenshtein::phonetic::load(&output_path)
                 .map_err(|e| anyhow::anyhow!("Verification failed: {}", e))?;
 
             if loaded.rules.len() == ruleset.rules.len() {
@@ -1200,8 +1200,8 @@ fn cmd_compile(
 /// Apply phonetic rules to transform text
 #[cfg(all(feature = "phonetic-rules", feature = "serialization"))]
 fn cmd_phonetic(text: &str, rules_path: &Path, compiled: bool) -> Result<()> {
-    use crate::phonetic::llev::{load_file_with_includes, RuleSetChar};
-    use crate::phonetic::{load_char, PhoneChar};
+    use liblevenshtein::phonetic::llev::{load_file_with_includes, RuleSetChar};
+    use liblevenshtein::phonetic::{load_char, PhoneChar};
 
     println!("{}", "Phonetic Transformation".bold().underline());
     println!();
@@ -1328,7 +1328,7 @@ fn cmd_phonetic(_text: &str, _rules_path: &Path, _compiled: bool) -> Result<()> 
 /// Compile .llre regex file to binary format
 #[cfg(all(feature = "phonetic-rules", feature = "serialization"))]
 fn cmd_compile_regex(input: &Path, output: Option<PathBuf>, verify: bool) -> Result<()> {
-    use crate::phonetic::llre::{compile, load_file, save};
+    use liblevenshtein::phonetic::llre::{compile, load_file, save};
 
     println!("{}", "Compiling LLRE Regex".bold().underline());
     println!();
@@ -1394,7 +1394,7 @@ fn cmd_compile_regex(input: &Path, output: Option<PathBuf>, verify: bool) -> Res
         println!();
         println!("  {} Verifying...", "→".cyan());
 
-        let loaded = crate::phonetic::llre::load(&output_path)
+        let loaded = liblevenshtein::phonetic::llre::load(&output_path)
             .map_err(|e| anyhow::anyhow!("Verification failed: {}", e))?;
 
         // Test that the loaded NFA has the same state count
@@ -1440,7 +1440,7 @@ fn cmd_match_regex(
     dotall: bool,
     compiled: bool,
 ) -> Result<()> {
-    use crate::phonetic::llre::{compile, load, load_file, CompiledNFA};
+    use liblevenshtein::phonetic::llre::{compile, load, load_file, CompiledNFA};
 
     println!("{}", "LLRE Regex Match".bold().underline());
     println!();
@@ -1927,8 +1927,8 @@ fn print_only_matching(
     handle: &mut std::io::StdoutLock,
     filename: &str,
     show_filename: bool,
-    line_match: &crate::phonetic::grep::LineMatch,
-    m: &crate::phonetic::grep::GrepMatch,
+    line_match: &liblevenshtein::phonetic::grep::LineMatch,
+    m: &liblevenshtein::phonetic::grep::GrepMatch,
     opts: &GrepOptions,
     use_color: bool,
 ) -> Result<()> {
@@ -1979,8 +1979,8 @@ fn print_full_line(
     handle: &mut std::io::StdoutLock,
     filename: &str,
     show_filename: bool,
-    line_match: &crate::phonetic::grep::LineMatch,
-    m: &crate::phonetic::grep::GrepMatch,
+    line_match: &liblevenshtein::phonetic::grep::LineMatch,
+    m: &liblevenshtein::phonetic::grep::GrepMatch,
     opts: &GrepOptions,
     use_color: bool,
 ) -> Result<()> {

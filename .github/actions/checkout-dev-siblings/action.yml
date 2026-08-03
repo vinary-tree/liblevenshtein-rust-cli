@@ -1,11 +1,7 @@
-name: Checkout dev sibling crates
+name: Checkout development sibling crates
 description: >
-  Clone the in-development sibling crates (llattice, libdictenstein) into the
-  workspace parent directory so liblevenshtein's `path = "../..."` dependencies
-  resolve against their development versions (mirroring the local checkout
-  layout). This is for development / CI workflows only — release and other
-  production workflows resolve these crates from crates.io instead (see the
-  `pin-siblings-cratesio` action).
+  Clone liblevenshtein and its dictionary dependencies beside this checkout so
+  the development-only path dependencies resolve.
 
 inputs:
   ref:
@@ -20,9 +16,6 @@ runs:
       shell: bash
       run: |
         set -euo pipefail
-        # The main repo is checked out at $GITHUB_WORKSPACE; its parent is where
-        # `../libdictenstein` and `../llattice` resolve to. llattice must be
-        # present too because libdictenstein itself depends on it by path.
         parent="$(dirname "$GITHUB_WORKSPACE")"
         for repo in llattice libdictenstein; do
           dest="$parent/$repo"
@@ -38,5 +31,8 @@ runs:
             echo "::endgroup::"
           fi
         done
+        git clone --depth 1 --branch "${{ inputs.ref }}" \
+          "https://github.com/universal-automata/liblevenshtein-rust.git" \
+          "$parent/liblevenshtein-rust"
         echo "Sibling crates available under $parent:"
-        ls -1d "$parent"/llattice "$parent"/libdictenstein
+        ls -1d "$parent"/llattice "$parent"/libdictenstein "$parent"/liblevenshtein-rust

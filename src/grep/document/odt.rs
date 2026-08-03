@@ -21,7 +21,7 @@ use super::text_output::push_line;
 /// # Example
 ///
 /// ```ignore
-/// use liblevenshtein::grep::document::odt::extract_text;
+/// use crate::grep::document::odt::extract_text;
 ///
 /// let odt_bytes = std::fs::read("document.odt")?;
 /// let text = extract_text(&odt_bytes)?;

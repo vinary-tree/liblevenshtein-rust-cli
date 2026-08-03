@@ -2,21 +2,31 @@
 //!
 //! Provides CLI utilities and an interactive REPL for dictionary operations.
 
+#![allow(dead_code, unused_imports)]
+
+mod cli;
+mod commands;
+mod grep;
+mod repl;
+
+#[cfg(test)]
+mod integration_tests;
+
 use clap::Parser;
 use colored::Colorize;
-use std::process;
+use std::process::ExitCode;
 
-use liblevenshtein::cli::commands;
-use liblevenshtein::cli::paths::PersistentConfig;
-use liblevenshtein::cli::Cli;
-use liblevenshtein::repl::{Command, LevenshteinHelper, ReplConfig, ReplState};
+use crate::cli::commands as cli_commands;
+use crate::cli::paths::PersistentConfig;
+use crate::cli::Cli;
+use crate::repl::{Command, LevenshteinHelper, ReplConfig, ReplState};
 use rustyline::error::ReadlineError;
 use rustyline::{Config, Editor};
 
 struct ReplLaunchOptions {
     dict_path: Option<std::path::PathBuf>,
-    backend: Option<liblevenshtein::repl::state::DictionaryBackend>,
-    format: Option<liblevenshtein::cli::args::SerializationFormat>,
+    backend: Option<crate::repl::state::DictionaryBackend>,
+    format: Option<crate::cli::args::SerializationFormat>,
     algorithm: liblevenshtein::transducer::Algorithm,
     max_distance: usize,
     prefix: bool,
@@ -25,7 +35,11 @@ struct ReplLaunchOptions {
     auto_sync: bool,
 }
 
-fn main() {
+/// Run the `liblevenshtein` command and return its process status.
+///
+/// The application modules are deliberately private; this entry seam exists so
+/// the installed binary remains a two-line wrapper and is not a reusable CLI API.
+pub fn run() -> ExitCode {
     let cli = Cli::parse();
 
     let result = if cli.repl {
@@ -43,18 +57,20 @@ fn main() {
         })
     } else {
         // Execute CLI command
-        commands::execute(&cli)
+        cli_commands::execute(&cli)
     };
 
     if let Err(e) = result {
         eprintln!("{}: {}", "Error".red().bold(), e);
-        process::exit(1);
+        ExitCode::FAILURE
+    } else {
+        ExitCode::SUCCESS
     }
 }
 
 fn run_repl(options: ReplLaunchOptions) -> anyhow::Result<()> {
-    use liblevenshtein::cli::detect::detect_format;
-    use liblevenshtein::cli::paths::default_dict_path;
+    use crate::cli::detect::detect_format;
+    use crate::cli::paths::default_dict_path;
 
     let ReplLaunchOptions {
         dict_path,
@@ -113,7 +129,7 @@ fn run_repl(options: ReplLaunchOptions) -> anyhow::Result<()> {
         let backend = merged_config.backend.unwrap_or(state.backend);
         let format = merged_config
             .format
-            .unwrap_or(liblevenshtein::cli::args::SerializationFormat::Bincode);
+            .unwrap_or(crate::cli::args::SerializationFormat::Bincode);
         default_dict_path(backend, format).ok()
     };
 
@@ -133,7 +149,7 @@ fn run_repl(options: ReplLaunchOptions) -> anyhow::Result<()> {
                         detection.format.format.to_string().green()
                     );
 
-                    match liblevenshtein::cli::commands::load_dictionary(path, detection.format) {
+                    match crate::cli::commands::load_dictionary(path, detection.format) {
                         Ok(container) => {
                             let count = container.len();
                             state.dictionary = container;
@@ -182,7 +198,7 @@ fn run_repl(options: ReplLaunchOptions) -> anyhow::Result<()> {
     }
 
     // Initialize state machine
-    use liblevenshtein::repl::{ReplEvent, ReplStateMachine};
+    use crate::repl::{ReplEvent, ReplStateMachine};
     let mut state_machine = ReplStateMachine::new();
 
     // Main REPL loop with state machine
@@ -204,7 +220,7 @@ fn run_repl(options: ReplLaunchOptions) -> anyhow::Result<()> {
         let context = format!("{}/{}/{}", backend_str, algo_str, dist_str);
 
         let prompt = match state_machine.phase() {
-            liblevenshtein::repl::ReplPhase::Continuation { .. } => {
+            crate::repl::ReplPhase::Continuation { .. } => {
                 format!(
                     "{} {}[{}] {}...> ",
                     state_indicator,
@@ -213,7 +229,7 @@ fn run_repl(options: ReplLaunchOptions) -> anyhow::Result<()> {
                     context
                 )
             }
-            liblevenshtein::repl::ReplPhase::Error { .. } => {
+            crate::repl::ReplPhase::Error { .. } => {
                 format!(
                     "{} {}[{}] {}> ",
                     state_indicator,
@@ -276,9 +292,7 @@ fn run_repl(options: ReplLaunchOptions) -> anyhow::Result<()> {
                 }
 
                 // Handle command execution if in Executing phase
-                if let liblevenshtein::repl::ReplPhase::Executing { ref command } =
-                    state_machine.phase()
-                {
+                if let crate::repl::ReplPhase::Executing { ref command } = state_machine.phase() {
                     // Check if command modifies dictionary
                     let modifies_dict = matches!(
                         command,

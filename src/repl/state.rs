@@ -5,13 +5,13 @@
 use crate::cli::args::SerializationFormat;
 use crate::commands::core::QueryParams;
 use crate::commands::handlers::query::execute_query;
-use crate::transducer::Algorithm;
 use anyhow::Result;
 use libdictenstein::double_array_trie::DoubleArrayTrie;
 use libdictenstein::dynamic_dawg::DynamicDawg;
 use libdictenstein::pathmap::PathMapDictionary;
 use libdictenstein::suffix_automaton::SuffixAutomaton;
 use libdictenstein::{Dictionary, DictionaryNode};
+use liblevenshtein::transducer::Algorithm;
 use std::cell::RefCell;
 use std::collections::HashMap;
 use std::path::Path;
@@ -560,7 +560,7 @@ impl ReplState {
 
         #[cfg(all(not(feature = "cli"), feature = "serialization"))]
         {
-            use crate::serialization::{BincodeSerializer, DictionarySerializer};
+            use libdictenstein::serialization::{BincodeSerializer, DictionarySerializer};
             let file = std::fs::File::open(path)
                 .with_context(|| format!("Failed to open dictionary: {}", path.display()))?;
             self.dictionary = match backend {
@@ -606,7 +606,7 @@ impl ReplState {
 
         #[cfg(all(not(feature = "cli"), feature = "serialization"))]
         {
-            use crate::serialization::{BincodeSerializer, DictionarySerializer};
+            use libdictenstein::serialization::{BincodeSerializer, DictionarySerializer};
             let file = std::fs::File::create(path)
                 .with_context(|| format!("Failed to create dictionary: {}", path.display()))?;
             match &self.dictionary {

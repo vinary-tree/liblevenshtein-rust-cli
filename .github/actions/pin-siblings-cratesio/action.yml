@@ -1,15 +1,12 @@
-name: Pin dictionary crates to crates.io
+name: Pin sibling crates to crates.io
 description: >
-  Drop the development-only local `path` override from the `libdictenstein`
-  dependency so production builds and packaging resolve it — and transitively
-  `llattice` — from the published crates.io versions via its `version`
-  requirement. For release / production workflows only; development and CI use
-  the sibling checkouts instead (see the `checkout-dev-siblings` action).
+  Drop development-only local `path` overrides so production builds resolve
+  liblevenshtein and libdictenstein from crates.io.
 
 runs:
   using: composite
   steps:
-    - name: Strip dev-only path override from libdictenstein dependency
+    - name: Strip development path overrides
       shell: bash
       run: |
         set -euo pipefail
@@ -19,21 +16,23 @@ runs:
 
         manifest = pathlib.Path("Cargo.toml")
         before = manifest.read_text()
-        # Strip the dev-only `path = "../libdictenstein", ` key while keeping the
-        # `version = "X"` requirement so cargo resolves from crates.io. Version
-        # agnostic, so bumping the dependency does not silently break this step.
-        after = re.sub(
-            r'libdictenstein = \{ path = "\.\./libdictenstein", (version = "[^"]+")',
-            r'libdictenstein = { \1',
-            before,
-        )
+        after = before
+        for crate, directory in (
+            ("liblevenshtein", "liblevenshtein-rust"),
+            ("libdictenstein", "libdictenstein"),
+        ):
+            after = re.sub(
+                rf'{crate} = \{{ path = "\.\./{directory}", (version = "[^"]+")',
+                rf'{crate} = {{ \1',
+                after,
+            )
         if after == before:
             raise SystemExit(
-                "ERROR: expected the dev `path` override on the libdictenstein "
-                "dependency, but it was not found. The manifest form changed — "
+                "ERROR: expected development `path` overrides, but none changed. "
+                "The manifest form changed — "
                 "update .github/actions/pin-siblings-cratesio/action.yml."
             )
         manifest.write_text(after)
         PY
-        echo "libdictenstein dependency now resolves from crates.io:"
-        grep -n 'libdictenstein =' Cargo.toml
+        cargo generate-lockfile
+        grep -nE '^(liblevenshtein|libdictenstein) =' Cargo.toml
