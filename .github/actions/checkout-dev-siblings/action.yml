@@ -31,8 +31,13 @@ runs:
             echo "::endgroup::"
           fi
         done
-        git clone --depth 1 --branch "${{ inputs.ref }}" \
-          "https://github.com/vinary-tree/liblevenshtein-rust.git" \
-          "$parent/liblevenshtein-rust"
+        core="$parent/liblevenshtein-rust"
+        if [ -d "$core/.git" ]; then
+          git -C "$core" fetch --depth 1 origin "${{ inputs.ref }}"
+          git -C "$core" checkout -f FETCH_HEAD
+        else
+          git clone --depth 1 --branch "${{ inputs.ref }}" \
+            "https://github.com/vinary-tree/liblevenshtein-rust.git" "$core"
+        fi
         echo "Sibling crates available under $parent:"
         ls -1d "$parent"/llattice "$parent"/libdictenstein "$parent"/liblevenshtein-rust
