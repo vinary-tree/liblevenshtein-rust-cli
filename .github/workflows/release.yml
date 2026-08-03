@@ -38,7 +38,7 @@ jobs:
           cp target/${{ matrix.target }}/release/liblevenshtein dist/
           cp README.md LICENSE dist/
           tar -czf liblevenshtein-${{ matrix.target }}.tar.gz -C dist .
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: liblevenshtein-${{ matrix.target }}
           path: liblevenshtein-${{ matrix.target }}.tar.gz
@@ -84,7 +84,7 @@ jobs:
             echo "license = Apache-2.0"
           } > "$root/.PKGINFO"
           bsdtar --zstd -cf "target/liblevenshtein-$version-1-x86_64.pkg.tar.zst" -C "$root" .
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: liblevenshtein-linux-packages
           path: |
