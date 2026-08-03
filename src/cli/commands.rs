@@ -966,8 +966,8 @@ fn cmd_config(switch: Option<PathBuf>, show: bool) -> Result<()> {
         println!("{}", "Config File Management".bold().underline());
         println!();
         println!("Usage:");
-        println!("  liblevenshtein config --show          Show config file paths");
-        println!("  liblevenshtein config --switch <path> Switch to different config file");
+        println!("  liblevenshtein --config-mgmt --show          Show config file paths");
+        println!("  liblevenshtein --config-mgmt --switch <path> Switch to different config file");
     }
 
     Ok(())

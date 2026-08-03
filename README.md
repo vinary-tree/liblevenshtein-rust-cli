@@ -9,18 +9,19 @@ This crate intentionally owns application-only dependencies such as `clap`,
 `calamine`, and the optional OCR stack. Applications can depend on
 `liblevenshtein` without resolving those packages.
 
-## Install
+## Status and installation
 
-```bash
-cargo install liblevenshtein-cli
-```
+Version 0.10.0 has not been published to crates.io yet. Until the coordinated
+library and CLI release is ready, build from sibling checkouts as described
+below. After publication, the package will be installable with
+`cargo install liblevenshtein-cli`.
 
-The installed executable remains `liblevenshtein`:
+The executable remains `liblevenshtein`. Operations are selected with flags:
 
 ```bash
 liblevenshtein --help
-liblevenshtein query "tset" --dict words.txt --max-distance 2
-liblevenshtein grep "fone" documents/
+liblevenshtein --query --text "tset" --dict words.bin --max-distance 2
+liblevenshtein --grep --pattern "fone" --files documents/report.pdf
 liblevenshtein --repl
 ```
 
@@ -49,6 +50,10 @@ Then:
 cargo build
 cargo test --all-features
 ```
+
+See the [documentation index](docs/README.md) for the complete command syntax,
+grep ingestion and security model, REPL reference, architecture, build, and
+future release process.
 
 ## Feature groups
 

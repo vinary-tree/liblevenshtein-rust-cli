@@ -1,0 +1,33 @@
+@startuml
+title liblevenshtein CLI — application and dependency boundary
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam ArrowColor #37474F
+skinparam ArrowThickness 2
+skinparam defaultFontColor #102027
+
+actor "Command user" as user #D1C4E9
+component "liblevenshtein executable\nsrc/main.rs" as binary #90CAF9
+component "CLI + REPL coordination\nsrc/cli · src/repl · src/commands" as app #64B5F6
+component "File ingestion adapters\ncompression · archives · documents · OCR" as adapters #FFCC80
+component "liblevenshtein\nautomata · distance · phonetic matching" as core #A5D6A7
+component "libdictenstein\ndictionary backends · persistence" as dict #81C784
+database "Dictionary and config files" as files #FFF59D
+collections "Untrusted input files" as inputs #FFAB91
+
+user --> binary : operation flags or REPL commands
+binary --> app : run()
+app --> core : construct and execute matchers
+app --> dict : load, query, mutate, save
+app --> adapters : request decoded text
+adapters --> inputs : bounded reads
+app --> files : explicit read/write
+core --> dict : traverse Dictionary traits
+
+note bottom of core
+  Reusable library boundary:
+  no dependency on the CLI crate
+  or application-only adapters
+end note
+@enduml

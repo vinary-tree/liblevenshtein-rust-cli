@@ -1,0 +1,53 @@
+@startuml
+title Fuzzy grep — complete ingestion, matching, and output flow
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam ArrowColor #37474F
+skinparam ArrowThickness 2
+skinparam activity {
+  BackgroundColor #90CAF9
+  BorderColor #37474F
+  DiamondBackgroundColor #FFF59D
+  DiamondBorderColor #6D4C41
+  StartColor #7E57C2
+  EndColor #7E57C2
+  BarColor #37474F
+}
+
+start
+:Parse --grep options; <<#D1C4E9>>
+if (Any --files?) then (no)
+  :Read standard input as text; <<#FFCC80>>
+  :Split standard input into lines; <<#90CAF9>>
+  :Apply liblevenshtein phonetic\nand edit-distance matcher; <<#A5D6A7>>
+  :Format spans, source, line, column,\ncolor, or count; <<#81D4FA>>
+  :Write matches to standard output; <<#D1C4E9>>
+else (yes)
+  repeat
+    :Parse path and optional archive-entry glob; <<#FFCC80>>
+    :Open input with decoded-size guard\n(default 100 MiB); <<#FFF59D>>
+    if (Compressed and auto-decompress?) then (yes)
+      :Decode gzip, zstd, xz, or bzip2; <<#FFCC80>>
+    endif
+    if (Tar or zip archive?) then (yes)
+      :Iterate matching regular-file entries; <<#FFCC80>>
+      :Apply size guard to each decoded entry; <<#FFF59D>>
+    endif
+    if (Supported document and extraction enabled?) then (yes)
+      :Extract PDF, DOCX, XLSX, EPUB,\nODT, or DjVu text; <<#FFCC80>>
+      if (PDF text empty and OCR enabled?) then (yes)
+        :Run Tesseract/Leptonica OCR; <<#FFAB91>>
+      endif
+    endif
+    if (Size exceeded, binary, or decode failed?) then (yes)
+      :Report rejected source; <<#EF9A9A>>
+    else (no)
+      :Decode text and split into lines; <<#90CAF9>>
+      :Apply liblevenshtein phonetic\nand edit-distance matcher; <<#A5D6A7>>
+      :Format spans, source, line, column,\ncolor, or count; <<#81D4FA>>
+      :Write matches to standard output; <<#D1C4E9>>
+    endif
+  repeat while (More files or entries?) is (yes)
+endif
+stop
+@enduml

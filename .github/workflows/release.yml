@@ -87,6 +87,8 @@ jobs:
             target/*.pkg.tar.zst
 
   publish:
+    needs: [binaries, linux-packages]
+    if: startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
     environment: crates-io
     steps:
@@ -99,6 +101,7 @@ jobs:
 
   github-release:
     needs: [binaries, linux-packages]
+    if: startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v4
