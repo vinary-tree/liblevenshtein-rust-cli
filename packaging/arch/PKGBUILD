@@ -5,11 +5,11 @@ pkgver=0.10.0
 pkgrel=1
 pkgdesc="Fuzzy matching, dictionary, REPL, and document grep utility"
 arch=('x86_64' 'aarch64')
-url="https://github.com/universal-automata/liblevenshtein-rust-cli"
+url="https://github.com/vinary-tree/liblevenshtein-rust-cli"
 license=('Apache')
 depends=('gcc-libs')
 makedepends=('rust' 'cargo' 'protobuf')
-source=("liblevenshtein-cli::git+https://github.com/universal-automata/liblevenshtein-rust-cli.git#tag=v${pkgver}")
+source=("liblevenshtein-cli::git+https://github.com/vinary-tree/liblevenshtein-rust-cli.git#tag=v${pkgver}")
 sha256sums=('SKIP')
 
 prepare() {

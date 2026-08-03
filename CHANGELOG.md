@@ -24,5 +24,5 @@ All notable changes to this project are documented here.
 - Application modules are private. The package library exposes only
   `liblevenshtein_cli::run()` for the binary wrapper.
 
-[Unreleased]: https://github.com/universal-automata/liblevenshtein-rust-cli/compare/v0.10.0...HEAD
-[0.10.0]: https://github.com/universal-automata/liblevenshtein-rust-cli/releases/tag/v0.10.0
+[Unreleased]: https://github.com/vinary-tree/liblevenshtein-rust-cli/compare/v0.10.0...HEAD
+[0.10.0]: https://github.com/vinary-tree/liblevenshtein-rust-cli/releases/tag/v0.10.0

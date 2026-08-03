@@ -1,7 +1,7 @@
 # liblevenshtein CLI
 
 Command-line, REPL, archive, compressed-file, and document-search tools powered
-by the [liblevenshtein](https://github.com/universal-automata/liblevenshtein-rust)
+by the [liblevenshtein](https://github.com/vinary-tree/liblevenshtein-rust)
 library.
 
 This crate intentionally owns application-only dependencies such as `clap`,

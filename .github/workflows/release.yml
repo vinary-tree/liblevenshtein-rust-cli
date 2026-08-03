@@ -70,7 +70,7 @@ jobs:
             echo "pkgbase = liblevenshtein"
             echo "pkgver = $version-1"
             echo "pkgdesc = Fuzzy matching, dictionary, REPL, and document grep utility"
-            echo "url = https://github.com/universal-automata/liblevenshtein-rust-cli"
+            echo "url = https://github.com/vinary-tree/liblevenshtein-rust-cli"
             echo "builddate = $(date +%s)"
             echo "packager = GitHub Actions"
             echo "size = $(du -sb "$root/usr" | cut -f1)"
