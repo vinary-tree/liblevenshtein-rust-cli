@@ -23,7 +23,10 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
-      - uses: ./.github/actions/pin-siblings-cratesio
+      - if: github.event_name == 'workflow_dispatch'
+        uses: ./.github/actions/checkout-dev-siblings
+      - if: github.event_name != 'workflow_dispatch'
+        uses: ./.github/actions/pin-siblings-cratesio
       - uses: dtolnay/rust-toolchain@stable
         with:
           targets: ${{ matrix.target }}
@@ -44,7 +47,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: ./.github/actions/pin-siblings-cratesio
+      - if: github.event_name == 'workflow_dispatch'
+        uses: ./.github/actions/checkout-dev-siblings
+      - if: github.event_name != 'workflow_dispatch'
+        uses: ./.github/actions/pin-siblings-cratesio
       - uses: dtolnay/rust-toolchain@stable
       - run: cargo build --locked --release
       - name: Debian package

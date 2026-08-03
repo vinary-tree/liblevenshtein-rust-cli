@@ -30,7 +30,8 @@ and ODT support. OCR is opt-in because it requires native Tesseract and
 Leptonica libraries:
 
 ```bash
-cargo install liblevenshtein-cli --features grep-pdf-ocr
+RUSTFLAGS="-C target-feature=+aes,+sse2" \
+  cargo install liblevenshtein-cli --features grep-pdf-ocr
 ```
 
 ## Build from a checkout
@@ -39,6 +40,7 @@ Keep sibling checkouts together:
 
 ```text
 workspace/
+├── llattice/
 ├── libdictenstein/
 ├── liblevenshtein-rust/
 └── liblevenshtein-rust-cli/
@@ -49,6 +51,14 @@ Then:
 ```bash
 cargo build
 cargo test --all-features
+```
+
+On x86_64, PathMap's gxhash dependency requires AES and SSE2 at compile time.
+The repository's Cargo configuration enables exactly those two features. For a
+future registry source install, supply the same portable feature floor:
+
+```bash
+RUSTFLAGS="-C target-feature=+aes,+sse2" cargo install liblevenshtein-cli
 ```
 
 See the [documentation index](docs/README.md) for the complete command syntax,

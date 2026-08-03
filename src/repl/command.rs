@@ -1340,7 +1340,7 @@ impl Command {
 {}
   For detailed help on any command: help <command>
   For tips on getting started:      help quickstart
-  Report issues: https://github.com/anthropics/liblevenshtein-rust
+  Report issues: https://github.com/vinary-tree/liblevenshtein-rust-cli
 "#,
             "liblevenshtein REPL - Interactive Levenshtein Dictionary Explorer"
                 .bold()

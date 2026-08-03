@@ -30,17 +30,32 @@ jobs:
       - run: cargo fmt --all --check
 
   package:
+    name: Source package and installed binary
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/checkout-dev-siblings
       - uses: dtolnay/rust-toolchain@stable
-      - name: Check publishable package
-        shell: bash
-        run: |
-          version="$(sed -n 's/.*version = "\([^"]*\)".*/\1/p' Cargo.toml | head -1)"
-          if cargo info "liblevenshtein@$version" >/dev/null 2>&1; then
-            cargo package --locked --allow-dirty
-          else
-            echo "Deferred until liblevenshtein $version is published (required release order)."
-          fi
+      - run: scripts/verify-package.sh
+
+  supply-chain:
+    name: Supply chain
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/checkout-dev-siblings
+      - uses: EmbarkStudios/cargo-deny-action@v2
+        with:
+          command: check advisories bans sources licenses
+
+  docs:
+    name: Documentation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update && sudo apt-get install -y plantuml
+      - run: docs/diagrams/render.sh --check
+      - uses: lycheeverse/lychee-action@v2
+        with:
+          args: --offline --no-progress README.md 'docs/**/*.md'
+          fail: true

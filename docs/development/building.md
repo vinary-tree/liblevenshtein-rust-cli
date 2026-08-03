@@ -21,7 +21,18 @@ cargo test --locked
 cargo test --locked --all-features
 cargo clippy --locked --all-features --all-targets -- -D warnings
 cargo fmt --all --check
+scripts/verify-package.sh
 ```
+
+`scripts/verify-package.sh` builds the normalized crate archive against the
+exact sibling library sources, installs that archive into a temporary Cargo
+root, and smoke-tests the installed executable. It does not contact a publish
+endpoint or alter either library manifest.
+
+PathMap uses gxhash on x86_64, where AES and SSE2 must be enabled at compile
+time. The committed Cargo configuration enables those two target features and
+does not use `target-cpu=native`, so release artifacts do not inherit unrelated
+instructions from the build host.
 
 ## Feature groups
 

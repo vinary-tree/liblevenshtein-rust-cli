@@ -5,6 +5,7 @@ resolver = "2"
 [package]
 name = "liblevenshtein-cli"
 version = "0.10.0"
+autobins = false
 edition = "2021"
 rust-version = "1.95"
 authors = ["Dylon Edwards <dylon.devo@gmail.com>"]
@@ -14,6 +15,14 @@ description = "Command-line, REPL, archive, and document-search tools for liblev
 keywords = ["levenshtein", "fuzzy-search", "grep", "cli", "automata"]
 categories = ["command-line-utilities", "text-processing"]
 readme = "README.md"
+exclude = [
+    ".config/",
+    ".github/",
+    ".gitignore",
+    "deny.toml",
+    "packaging/",
+    "scripts/",
+]
 
 [lib]
 name = "liblevenshtein_cli"

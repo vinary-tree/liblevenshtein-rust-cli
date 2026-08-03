@@ -7,14 +7,20 @@ Version 0.10.0 remains unpublished while coordinated changes are in progress.
 
 1. Verify and publish any required `llattice` and `libdictenstein` versions.
 2. Verify and publish `liblevenshtein` 0.10.0.
-3. Replace development path resolution with registry resolution and package
-   `liblevenshtein-cli` 0.10.0.
+3. Verify `liblevenshtein-cli` 0.10.0 against the published library versions.
 4. Only after reviewing the package contents, publish the CLI crate and create
    binary/package release artifacts.
 
-The CLI cannot be packaged against crates.io until the exact compatible core
-library version exists there. CI intentionally defers its packaging check while
-that prerequisite is absent.
+CI always verifies packaging: it builds the normalized CLI crate archive
+against the exact sibling sources, installs the archive into an isolated Cargo
+root, and smoke-tests the installed executable. A future registry publication
+still follows the dependency order above so registry consumers resolve the
+same compatible library versions.
+
+A manual release-workflow run rehearses binary and operating-system packages
+against the sibling source checkouts and cannot publish. A future tag build
+resolves the previously published library crates from the registry; only its
+tag-gated jobs can publish the CLI crate or create the GitHub release.
 
 ## Pre-release evidence
 

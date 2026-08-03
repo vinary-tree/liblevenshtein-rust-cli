@@ -1,153 +1,23 @@
-# Rust
+# Rust build and test output
 /target/
-/liblevenshtein-macros/target/
 **/*.rs.bk
 *.pdb
+*.profraw
+*.profdata
+*.proptest-regressions
+/coverage/
 
-# IDE
+# Editor and operating-system files
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
-
-# OS
+.#*
 .DS_Store
 Thumbs.db
 
-# Testing
-*.profraw
-*.profdata
-*.proptest-regressions
-
-# Profiling artifacts
-perf.data
-perf.data.old
-flamegraph.svg
-flamegraph_*.svg
+# Local profiling output
+perf.data*
+flamegraph*.svg
 flamegraphs/
-perf.data*
-perf-*.data*
-
-# Benchmark results and logs
-*_results.log
-*_results.txt
-*_bench.log
-*_run.log
-*_optimized.log
-*_optimized.txt
-baseline_*.txt
-backend_comparison_*.txt
-fuzzy_map_*.txt
-hierarchical_scope_*.txt
-query_iterator_*.txt
-bench_results_*.txt
-eviction_wrapper_bench_*.txt
-rayon_eval_*.txt
-batch*_*.txt
-*_analysis.md
-fuzzy_multimap_*.txt
-fuzzy_multimap_*.md
-docs/research/artrie/perf-reports/*.txt
-
-# GUARD — documentation is never benchmark scratch.
-#
-# The patterns above (`*_analysis.md`, `fuzzy_multimap_*.md`) were written for generated
-# benchmark output at the repo root, but as bare globs they also match real documentation
-# anywhere in the tree. They were silently excluding committed-worthy docs from version
-# control — `docs/generalized/phase2d_analysis.md` (328 lines) and
-# `docs/time_series/benchmark_analysis.md` (173 lines), both cross-linked from their sibling
-# READMEs — so a fresh clone had dangling links to files that had never been committed.
-#
-# Re-include everything under `docs/`: nothing there is regenerable scratch. (Generated
-# artifacts that DO live under docs/ — perf dumps, Coq .vo/.glob, flamegraphs — are ignored
-# by extension elsewhere in this file, so this negation cannot un-ignore them.)
-!docs/**/*.md
-
-# Analysis scripts (temporary/development)
-analyze_*.py
-extract_*.sh
-profile_*.sh
-benchmark_*.sh
-
-# LaTeX artifacts (documentation generation)
-*.aux
-*.log
-*.out
-*.toc
-*.tex
-*latex*.py
-generate_latex_doc.py
-liblevenshtein-rust-doc.pdf
-
-# Test corpora (downloaded on-demand, not committed)
-data/corpora/*.txt
-data/corpora/*.dat
-data/corpora/*.zip
-data/corpora/birkbeck/
-data/generated/
-
-rocq/**/.lia.cache
-rocq/**/*.vo
-rocq/**/*.vok
-rocq/**/*.vos
-rocq/**/*.glob
-rocq/**/Makefile
-rocq/**/Makefile.conf
-rocq/**/.Makefile.d
-
-# Rocq/Coq verification artifacts
-docs/verification/**/.lia.cache
-docs/verification/**/.csdp.cache
-docs/verification/**/trace
-docs/verification/**/*.vo
-docs/verification/**/*.vok
-docs/verification/**/*.vos
-docs/verification/**/*.glob
-docs/verification/**/.*.aux
-docs/verification/**/html/
-docs/verification/**/extracted/
-docs/verification/**/Makefile
-docs/verification/**/Makefile.conf
-docs/verification/**/Makefile.coq
-docs/verification/**/Makefile.coq.conf
-docs/verification/**/.Makefile.coq.d
-docs/verification/**/.Makefile.d
-
-# TLA+ TLC model-checker working state — timestamped checkpoint / disk-queue
-# directories (regenerable scratch, e.g. states/26-06-11-19-12-19.400/ holding
-# MsmTrieSearch.st, nodes_*, ptrs_*). Committed TLC evidence lives in
-# docs/verification/tla/states/tlc-results-*.txt and is deliberately NOT ignored.
-/states/
-docs/verification/**/states/[0-9]*/
-
-# Profiling artifacts
-*.perf.data
-*.perf.data.old
-perf.data*
-flamegraph.svg
-
-# Coq/Rocq arithmetic-tactic caches (lia, nia, nra)
-.lia.cache
-.nia.cache
-.nra.cache
-**/.lia.cache
-**/.nia.cache
-**/.nra.cache
-
-*.bak
-# Generated optimization artifacts
-docs/optimization/*.txt
-perf.data*
-
-# Documentation-tooling scratch.
-# The tools themselves ARE committed — scripts/doc-math-prescan.raku (scanner),
-# scripts/doc-math-convert.raku (guarded converter) and scripts/doc-mathlint.sh (the CI gate
-# over docs/.mathlint-include.txt). The transient reports they emit are regenerable and are not.
-/scratchpad_scan.txt
-/scratchpad/
-/residuals.txt
-
-.pgmcp.toml
-
-.#*
