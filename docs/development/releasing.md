@@ -22,6 +22,14 @@ against the sibling source checkouts and cannot publish. A future tag build
 resolves the previously published library crates from the registry; only its
 tag-gated jobs can publish the CLI crate or create the GitHub release.
 
+The `crates-io` and `github-release` GitHub environments both require reviewer
+`dylon`, allow that sole owner to approve the deployment, and admit `v*` tags
+only. The crates.io job grants `id-token: write` locally and exchanges its
+GitHub identity for a short-lived registry token through
+`rust-lang/crates-io-auth-action`; it does not store a Cargo token. The
+GitHub-release job alone receives `contents: write`. Repository and
+organization workflow-token defaults remain read-only.
+
 ## Pre-release evidence
 
 Before a future tag, require clean results for formatting, default and
