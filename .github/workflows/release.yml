@@ -29,7 +29,7 @@ jobs:
         uses: ./.github/actions/checkout-dev-siblings
       - if: github.event_name != 'workflow_dispatch'
         uses: ./.github/actions/pin-siblings-cratesio
-      - uses: dtolnay/rust-toolchain@1.95
+      - uses: dtolnay/rust-toolchain@1.120
         with:
           targets: ${{ matrix.target }}
       - run: cargo build --locked --release --target ${{ matrix.target }}
@@ -55,7 +55,7 @@ jobs:
         uses: ./.github/actions/checkout-dev-siblings
       - if: github.event_name != 'workflow_dispatch'
         uses: ./.github/actions/pin-siblings-cratesio
-      - uses: dtolnay/rust-toolchain@1.95
+      - uses: dtolnay/rust-toolchain@1.120
       - run: cargo build --locked --release
       - name: Debian package
         run: |
@@ -109,7 +109,7 @@ jobs:
         with:
           persist-credentials: false
       - uses: ./.github/actions/pin-siblings-cratesio
-      - uses: dtolnay/rust-toolchain@1.95
+      - uses: dtolnay/rust-toolchain@1.120
       - name: Exchange GitHub identity for a short-lived crates.io token
         id: crates-io-auth
         uses: rust-lang/crates-io-auth-action@v1
